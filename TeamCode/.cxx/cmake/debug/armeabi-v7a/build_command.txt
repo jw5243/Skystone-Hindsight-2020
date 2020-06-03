@@ -1,10 +1,10 @@
 Executable : C:\Users\Robotics 15\AppData\Local\Android\Sdk\cmake\3.6.4111459\bin\cmake.exe
 arguments : 
--HC:\Users\Robotics 15\Documents\2019\FTC\15026\Hindsight-2020-Winter-Break\TeamCode
--BC:\Users\Robotics 15\Documents\2019\FTC\15026\Hindsight-2020-Winter-Break\TeamCode\.cxx\cmake\debug\armeabi-v7a
+-HC:\Users\Robotics 15\Documents\2019\FTC\15026\Skystone-Hindsight-2020-Project\TeamCode
+-BC:\Users\Robotics 15\Documents\2019\FTC\15026\Skystone-Hindsight-2020-Project\TeamCode\.cxx\cmake\debug\armeabi-v7a
 -DANDROID_ABI=armeabi-v7a
 -DANDROID_PLATFORM=android-24
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\Robotics 15\Documents\2019\FTC\15026\Hindsight-2020-Winter-Break\TeamCode\build\intermediates\cmake\debug\obj\armeabi-v7a
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Users\Robotics 15\Documents\2019\FTC\15026\Skystone-Hindsight-2020-Project\TeamCode\build\intermediates\cmake\debug\obj\armeabi-v7a
 -DCMAKE_BUILD_TYPE=Debug
 -DANDROID_NDK=C:\Users\Robotics 15\AppData\Local\Android\Sdk\ndk-bundle
 -DCMAKE_TOOLCHAIN_FILE=C:\Users\Robotics 15\AppData\Local\Android\Sdk\ndk-bundle\build\cmake\android.toolchain.cmake

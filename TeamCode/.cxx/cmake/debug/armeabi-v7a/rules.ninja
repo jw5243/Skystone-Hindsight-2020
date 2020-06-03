@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Users\Robotics 15\AppData\Local\Android\Sdk\cmake\3.6.4111459\bin\cmake.exe" -H"C:\Users\Robotics 15\Documents\2019\FTC\15026\Hindsight-2020-Winter-Break\TeamCode" -B"C:\Users\Robotics 15\Documents\2019\FTC\15026\Hindsight-2020-Winter-Break\TeamCode\.cxx\cmake\debug\armeabi-v7a"
+  command = "C:\Users\Robotics 15\AppData\Local\Android\Sdk\cmake\3.6.4111459\bin\cmake.exe" -H"C:\Users\Robotics 15\Documents\2019\FTC\15026\Skystone-Hindsight-2020-Project\TeamCode" -B"C:\Users\Robotics 15\Documents\2019\FTC\15026\Skystone-Hindsight-2020-Project\TeamCode\.cxx\cmake\debug\armeabi-v7a"
   description = Re-running CMake...
   generator = 1
 

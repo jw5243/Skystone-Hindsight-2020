@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Robotics 15/Documents/2019/FTC/15026/Hindsight-2020-Winter-Break/TeamCode
+# Install script for directory: C:/Users/Robotics 15/Documents/2019/FTC/15026/Skystone-Hindsight-2020-Project/TeamCode
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Robotics 15/Documents/2019/FTC/15026/Hindsight-2020-Winter-Break/TeamCode/.cxx/cmake/debug/armeabi-v7a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Robotics 15/Documents/2019/FTC/15026/Skystone-Hindsight-2020-Project/TeamCode/.cxx/cmake/debug/armeabi-v7a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
