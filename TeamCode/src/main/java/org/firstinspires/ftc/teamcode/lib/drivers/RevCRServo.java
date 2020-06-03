@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.drivers;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 public class RevCRServo {
@@ -12,6 +13,7 @@ public class RevCRServo {
     public RevCRServo(CRServo crServo) {
         setCrServo(crServo);
         setLastPower(0d);
+        getCrServo().setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setPower(double power) {

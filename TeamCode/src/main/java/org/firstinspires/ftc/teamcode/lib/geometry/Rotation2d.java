@@ -162,6 +162,10 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
         return new Translation2d(cos_angle_, sin_angle_);
     }
 
+    public Rotation2d multiply(final double factor, final boolean normalize) {
+        return new Rotation2d(getRadians() * factor, normalize);
+    }
+
     protected double WrapRadians(double radians) {
         final double k2Pi = 2.0 * Math.PI;
         radians = radians % k2Pi;

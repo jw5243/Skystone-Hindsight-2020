@@ -16,6 +16,7 @@ public class RevMotor {
     private              double            encoderTicksPerRevolution;
     private              double            encoderTicksPerInch;
     private              double            velocity;
+    private              double            externalGearRatio = 1d;
 
     public RevMotor(final ExpansionHubMotor motor, final boolean onMasterHub,
                             final boolean resetEncoder, final boolean brakeMode, final boolean reverse) {
@@ -37,8 +38,8 @@ public class RevMotor {
     public RevMotor(final ExpansionHubMotor motor, final boolean onMasterHub,
                             final boolean resetEncoder, final boolean brakeMode, final boolean reverse,
                             final double encoderTicksPerRevolution) {
-        this(motor, onMasterHub, resetEncoder, reverse, brakeMode);
-        setEncoderTicksPerRevolution(encoderTicksPerRevolution);
+        this(motor, onMasterHub, resetEncoder, brakeMode, reverse);
+        setEncoderTicksPerRevolution(encoderTicksPerRevolution * getExternalGearRatio());
     }
 
     public RevMotor(final ExpansionHubMotor motor, final boolean onMasterHub,
@@ -46,6 +47,14 @@ public class RevMotor {
                             final double encoderTicksPerRevolution, final double rotationDiameter) {
         this(motor, onMasterHub, resetEncoder, brakeMode, reverse, encoderTicksPerRevolution);
         setEncoderTicksPerInch(getEncoderTicksPerRevolution() / (rotationDiameter * Math.PI));
+    }
+
+    public RevMotor(final ExpansionHubMotor motor, final boolean onMasterHub,
+                    final boolean resetEncoder, final boolean brakeMode, final boolean reverse,
+                    final double encoderTicksPerRevolution, final double rotationDiameter,
+                    final double externalGearRatio) {
+        this(motor, onMasterHub, resetEncoder, brakeMode, reverse, encoderTicksPerRevolution, rotationDiameter);
+        setExternalGearRatio(externalGearRatio);
     }
 
     public void resetEncoder() {
@@ -177,5 +186,13 @@ public class RevMotor {
 
     public static double getMinDeltaPower() {
         return MIN_DELTA_POWER;
+    }
+
+    public double getExternalGearRatio() {
+        return externalGearRatio;
+    }
+
+    public void setExternalGearRatio(double externalGearRatio) {
+        this.externalGearRatio = externalGearRatio;
     }
 }

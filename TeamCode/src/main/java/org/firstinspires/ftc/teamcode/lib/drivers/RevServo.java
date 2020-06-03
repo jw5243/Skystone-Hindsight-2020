@@ -15,7 +15,9 @@ public class RevServo {
         //Ensure that the position argument is within the capabilities of the servo
         position = position < -1 ? -1 : position > 1 ? 1 : position;
 
-        if(Math.abs(position - getLastPosition()) >= getMinDeltaPosition()) {
+        //Check if position is zero in the case of initialization, since the servo is defaulted
+        //to zero position even though the servo is not powered by default.
+        if(Math.abs(position - getLastPosition()) >= getMinDeltaPosition() || position == 0d) {
             getServo().setPosition(position);
             setLastPosition(position);
         }

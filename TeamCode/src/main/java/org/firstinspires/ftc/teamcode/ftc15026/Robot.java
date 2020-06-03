@@ -2,33 +2,42 @@ package org.firstinspires.ftc.teamcode.ftc15026;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.ejml.simple.SimpleMatrix;
 import org.firstinspires.ftc.teamcode.ftc15026.control.EnhancedGamepad;
+import org.firstinspires.ftc.teamcode.lib.control.MecanumDriveMPC;
+import org.firstinspires.ftc.teamcode.lib.control.MecanumRunnableLQR;
 import org.firstinspires.ftc.teamcode.lib.drivers.RevCRServo;
 import org.firstinspires.ftc.teamcode.lib.drivers.RevMotor;
 import org.firstinspires.ftc.teamcode.lib.drivers.RevServo;
 import org.firstinspires.ftc.teamcode.lib.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.lib.physics.MecanumDriveModel;
 import org.firstinspires.ftc.teamcode.lib.util.TimeProfiler;
 import org.firstinspires.ftc.teamcode.lib.util.TimeUnits;
 
 public abstract class Robot extends OpMode {
     private static final boolean isUsingComputer = false;
+    private static final boolean optimizeInputChange = false;
 
-    private static final double WHEEL_DIAMETER = 100d / 25.4d;
-    private static final double L1 = 9d;
-    private static final double L2 = 9d;
-    private static final double D1 = 9d;
-    private static final double D2 = 9d;
-    private static final double ROBOT_LENGTH = getL1() + getL2();
+    private static final double WHEEL_DIAMETER = 100d / 25.4d; //in
+    private static final double L1 = 9d; //in
+    private static final double L2 = 9d; //in
+    private static final double D1 = 9d; //in
+    private static final double D2 = 9d; //in
+    private static final double ROBOT_LENGTH = getL1() + getL2(); //in
 
     private static Alliance alliance;
-    private static Pose2d   drivetrainPower;
+    private static volatile Pose2d drivetrainPower;
+    private static MecanumDriveModel driveModel;
+    private static MecanumDriveMPC driveMPC;
+    private static MecanumRunnableLQR runnableLQR;
+    private static SimpleMatrix state;
+    private static SimpleMatrix lastInput;
 
     private static EnhancedGamepad enhancedGamepad1;
     private static EnhancedGamepad enhancedGamepad2;
-
-    private static RevMotor[]   motors;
-    private static RevServo[]   servos;
-    private static RevCRServo[] crServos;
+    private RevMotor[]   motors;
+    private RevServo[]   servos;
+    private RevCRServo[] crServos;
 
     private static TimeProfiler updateRuntime;
     private static double dt;
@@ -66,10 +75,6 @@ public abstract class Robot extends OpMode {
         getEnhancedGamepad2().update();
     }
 
-    public static boolean isUsingComputer() {
-        return isUsingComputer;
-    }
-
     public static Alliance getAlliance() {
         return alliance;
     }
@@ -92,22 +97,6 @@ public abstract class Robot extends OpMode {
 
     public static void setEnhancedGamepad2(EnhancedGamepad enhancedGamepad2) {
         Robot.enhancedGamepad2 = enhancedGamepad2;
-    }
-
-    public static RevMotor[] getMotors() {
-        return motors;
-    }
-
-    public static void setMotors(RevMotor[] motors) {
-        Robot.motors = motors;
-    }
-
-    public static RevServo[] getServos() {
-        return servos;
-    }
-
-    public static void setServos(RevServo[] servos) {
-        Robot.servos = servos;
     }
 
     public static TimeProfiler getUpdateRuntime() {
@@ -162,11 +151,75 @@ public abstract class Robot extends OpMode {
         return getWheelDiameter() / 2d;
     }
 
-    public static RevCRServo[] getCrServos() {
+    public static boolean isUsingComputer() {
+        return isUsingComputer;
+    }
+
+    public static boolean isOptimizeInputChange() {
+        return optimizeInputChange;
+    }
+
+    public static MecanumDriveModel getDriveModel() {
+        return driveModel;
+    }
+
+    public static void setDriveModel(MecanumDriveModel driveModel) {
+        Robot.driveModel = driveModel;
+    }
+
+    public static MecanumDriveMPC getDriveMPC() {
+        return driveMPC;
+    }
+
+    public static void setDriveMPC(MecanumDriveMPC driveMPC) {
+        Robot.driveMPC = driveMPC;
+    }
+
+    public static MecanumRunnableLQR getRunnableLQR() {
+        return runnableLQR;
+    }
+
+    public static void setRunnableLQR(MecanumRunnableLQR runnableLQR) {
+        Robot.runnableLQR = runnableLQR;
+    }
+
+    public static SimpleMatrix getState() {
+        return state;
+    }
+
+    public static void setState(SimpleMatrix state) {
+        Robot.state = state;
+    }
+
+    public static SimpleMatrix getLastInput() {
+        return lastInput;
+    }
+
+    public static void setLastInput(SimpleMatrix lastInput) {
+        Robot.lastInput = lastInput;
+    }
+
+    public RevMotor[] getMotors() {
+        return motors;
+    }
+
+    public void setMotors(RevMotor[] motors) {
+        this.motors = motors;
+    }
+
+    public RevServo[] getServos() {
+        return servos;
+    }
+
+    public void setServos(RevServo[] servos) {
+        this.servos = servos;
+    }
+
+    public RevCRServo[] getCrServos() {
         return crServos;
     }
 
-    public static void setCrServos(RevCRServo[] crServos) {
-        Robot.crServos = crServos;
+    public void setCrServos(RevCRServo[] crServos) {
+        this.crServos = crServos;
     }
 }

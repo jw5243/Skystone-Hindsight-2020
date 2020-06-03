@@ -39,6 +39,10 @@ public class Pose2d implements IPose2d<Pose2d> {
         rotation_ = new Rotation2d(other.rotation_);
     }
 
+    public Pose2d(final double x, final double y, final double radians, final boolean normalize) {
+        this(x, y, new Rotation2d(radians, normalize));
+    }
+
     public static Pose2d fromTranslation(final Translation2d translation) {
         return new Pose2d(translation, new Rotation2d());
     }

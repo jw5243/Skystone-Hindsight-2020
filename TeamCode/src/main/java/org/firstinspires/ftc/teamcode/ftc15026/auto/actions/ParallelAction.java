@@ -31,8 +31,8 @@ public class ParallelAction implements Action {
 
     @Override
     public boolean isFinished() {
-        for (Action action : mActions) {
-            if (!action.isFinished()) {
+        for(Action action : mActions) {
+            if(!action.isFinished()) {
                 return false;
             }
         }

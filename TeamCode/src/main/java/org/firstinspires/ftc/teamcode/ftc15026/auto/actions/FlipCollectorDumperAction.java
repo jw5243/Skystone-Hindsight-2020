@@ -4,11 +4,6 @@ import org.firstinspires.ftc.teamcode.ftc15026.statemachines.CollectorDumperStat
 import org.firstinspires.ftc.teamcode.ftc15026.subsystems.Collector;
 
 public class FlipCollectorDumperAction implements Action {
-    private CollectorDumperStateMachine.State state;
-
-    public FlipCollectorDumperAction(CollectorDumperStateMachine.State state) {
-        setState(state);
-    }
 
     @Override
     public void start() {
@@ -17,25 +12,16 @@ public class FlipCollectorDumperAction implements Action {
 
     @Override
     public void update() {
-        CollectorDumperStateMachine.updateState(getState());
-        Collector.getInstance().getCollectorDumper().setPosition(CollectorDumperStateMachine.getState().getPosition());
+
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 
     @Override
     public void done() {
 
-    }
-
-    public CollectorDumperStateMachine.State getState() {
-        return state;
-    }
-
-    public void setState(CollectorDumperStateMachine.State state) {
-        this.state = state;
     }
 }

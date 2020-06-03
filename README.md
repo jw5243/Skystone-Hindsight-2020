@@ -190,7 +190,7 @@ Version 4.2 (built on 18.10.30)
      - Fixed the "Download image" feature so it will work if there are text blocks in the op mode.    
  * Introduce support for Google's TensorFlow Lite technology for object detetion for 2018-2019 game.
      - TensorFlow lite can recognize Gold Mineral and Silver Mineral from 2018-2019 game.
-     - Example Java and Block op modes are included to show how to determine the relative position of the gold block (left, center, right).
+     - Example Java and Block op modes are included to show how to determine the relative pose of the gold block (left, center, right).
 
 **************************************************************************************
 # Release Information

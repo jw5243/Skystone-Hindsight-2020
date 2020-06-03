@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.lib.drivers;
 
 public enum Motor {
-    GOBILDA_312_RPM(312, 537.6),
-    GOBILDA_223_RPM(223, 753.2),
-    NEVERST_3_7(1780, 103.6);
+    GOBILDA_435_RPM(435d, 383.6d),
+    GOBILDA_312_RPM(312d, 537.6d),
+    GOBILDA_223_RPM(223d, 753.2d),
+    NEVERST_3_7(1780d, 103.6d),
+    REV_CORE_HEX(125d, 288d);
 
     private final double RPM;
     private final double ENCODER_TICKS_PER_REVOLUTION;

@@ -1,13 +1,58 @@
 package org.firstinspires.ftc.teamcode.ftc15026.subsystems;
 
-import org.firstinspires.ftc.teamcode.lib.drivers.RevMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.lib.control.ControlConstants;
+import org.firstinspires.ftc.teamcode.lib.drivers.RevMotor;
+import org.firstinspires.ftc.teamcode.lib.motion.IMotionProfile;
+import org.firstinspires.ftc.teamcode.lib.motion.ResidualVibrationReductionMotionProfilerGenerator;
+import org.firstinspires.ftc.teamcode.lib.motion.TrapezoidalMotionProfileGenerator;
+
+import java.util.function.DoubleConsumer;
+
+/**
+ * This {@code class} represents a linear extension mechanism that is run by a motor gearbox. This
+ * extension process must be controlled, so this {@code subsystem} takes care of that with feedback
+ * and feedforward controllers to follow a given trajectory towards a setpoint.
+ *
+ * The feedback controller consists of a standard PID loop to stabilize the linear extension around
+ * the reference trajectory's current desired position. The feedforward controller on the other hand,
+ * takes into account the reference trajectory's desired velocity and acceleration. There is an
+ * additional feedforward controller that attempts to overcome static friction in the system, so
+ * that an integral term in the feedback controller is essentially unnecessary.
+ *
+ * We consider a linear extension as a {@code subsystem} as an extension mechanism is most often
+ * coordinated with an additional mechanism to complete an overall task in conjunction.
+ *
+ * @see IMotionProfile
+ */
 public abstract class Extension implements Subsystem {
+    /**
+     * This represents the aggregate of motors for running the linear extension. It is assumed that
+     * the motors comprising the gearbox run in the same direction, or motors are set in reverse if
+     * necessary.
+     *
+     * @see RevMotor
+     * @see Direction#REVERSE
+     */
     private Gearbox gearboxExtension;
+
+    /**
+     * This contains all of the constants for every possible feedback and feedforward controller
+     * that this {@code class} can supply. While not every controller will be used, different
+     * constructors and simply setting unused constants to zero notifies the system not to use the
+     * corresponding controllers.
+     */
+    private ControlConstants controlConstants;
     private ExtensionControl extensionControl;
-    private double setpoint;
+    private IMotionProfile motionProfile;
+    private double lastError;
+    private double runningSum;
 
     public enum ExtensionControl {
+        NONE,
+
         /**
          * This controller is the most basic form of motion profiling, which simply yields the max
          * power of the motor(s) based on the sign of the error of the extension position, so max
@@ -60,6 +105,10 @@ public abstract class Extension implements Subsystem {
          * of control.
          */
         RESIDUAL_VIBRATION_REDUCTION,
+
+        /**
+         *
+         */
         FAST_RESIDUAL_VIBRATION_REDUCTION
     }
 
@@ -72,12 +121,19 @@ public abstract class Extension implements Subsystem {
     }
 
     public Extension(Gearbox gearbox) {
-        this(gearbox, ExtensionControl.BANG_BANG);
+        this(gearbox, ExtensionControl.BANG_BANG, new ControlConstants());
     }
 
-    public Extension(Gearbox gearbox, ExtensionControl extensionControl) {
+    public Extension(RevMotor motor, ExtensionControl extensionControl, ControlConstants controlConstants) {
+        this(new Gearbox(motor), extensionControl, controlConstants);
+    }
+
+    public Extension(Gearbox gearbox, ExtensionControl extensionControl, ControlConstants controlConstants) {
         setGearboxExtension(gearbox);
+        setControlConstants(controlConstants);
         setExtensionControl(extensionControl);
+        resetRunningSum();
+        setLastError(0d);
     }
 
     @Override
@@ -85,14 +141,74 @@ public abstract class Extension implements Subsystem {
 
     }
 
+    /**
+     * Based on the {@code setpoint} specified for the extension to reach, the motor gearbox
+     * compensates for potential error for a given motion profile, otherwise only a feedback
+     * controller is used.
+     *
+     * @param dt Elapsed time since {@code update} was last called.
+     */
     @Override
     public void update(double dt) {
+        //Get the current error based on the position of the extension.
+        double error = getSetpoint() - getGearboxExtension().getPosition();
+        double velocityTarget = 0d;
+        double accelerationTarget = 0d;
+        if(getMotionProfile() != null) {
+            error = getMotionProfile().getPosition() - getGearboxExtension().getPosition();
+            velocityTarget = getMotionProfile().getVelocity();
+            accelerationTarget = getMotionProfile().getAcceleration();
+        }
 
+        if(!hasReachedDesiredExtensionLength(1 / 4d)) {
+            //Update the running sum for the integral feedback controller.
+            addToRunningSum(getControlConstants().kI() * error * dt);
+            //Prevent integral windup
+            //setRunningSum(Range.clip(getControlConstants().kI() * getRunningSum(), getMinPower(dt), getMaxPower(dt)) /
+            //        getControlConstants().kI());
+
+            double output =
+                    getControlConstants().kP() * error +
+                            getControlConstants().kI() * getRunningSum() +
+                            getControlConstants().kD() * ((error - getLastError()) / dt - velocityTarget) +
+                            getControlConstants().kV() * velocityTarget +
+                            getControlConstants().kA() * accelerationTarget;
+            getGearboxExtension().setPower(Range.clip(output + getControlConstants().kS() * Math.signum(output), getMinPower(dt), getMaxPower(dt)));
+        } else {
+            getGearboxExtension().setPower(0d);
+        }
+
+        setLastError(error);
     }
 
     @Override
     public void stop() {
+        getGearboxExtension().setPower(0d);
+    }
 
+    public boolean hasReachedDesiredExtensionLength(double threshold) {
+        return Math.abs(getSetpoint() - getGearboxExtension().getPosition()) <= threshold;
+    }
+
+    public abstract double getSetpoint();
+    public abstract DoubleConsumer updateSetpointUnprotected();
+
+    public abstract double getMinPower(double dt);
+    public abstract double getMaxPower(double dt);
+    public abstract double getMaxExtensionSpeed();
+    public abstract double getMaxExtensionAcceleration();
+
+    public void retract() {
+        setSetpoint(0d);
+        resetRunningSum();
+    }
+
+    public void resetRunningSum() {
+        setRunningSum(0d);
+    }
+
+    public void addToRunningSum(double runningTerm) {
+        setRunningSum(getRunningSum() + runningTerm);
     }
 
     public Gearbox getGearboxExtension() {
@@ -103,12 +219,16 @@ public abstract class Extension implements Subsystem {
         this.gearboxExtension = gearboxExtension;
     }
 
-    public double getSetpoint() {
-        return setpoint;
-    }
-
     public void setSetpoint(double setpoint) {
-        this.setpoint = setpoint;
+        if(setpoint != getSetpoint() && (getMotionProfile() == null || getMotionProfile().isDone())) {
+            if(getExtensionControl().ordinal() == ExtensionControl.TRAPEZOIDAL.ordinal()) {
+                setMotionProfile(new TrapezoidalMotionProfileGenerator(setpoint, getGearboxExtension().getPosition(), getGearboxExtension().getVelocity(), getMaxExtensionSpeed(), getMaxExtensionAcceleration()));
+            } else if(getExtensionControl().ordinal() == ExtensionControl.RESIDUAL_VIBRATION_REDUCTION.ordinal()) {
+                setMotionProfile(new ResidualVibrationReductionMotionProfilerGenerator(getGearboxExtension().getPosition(), setpoint - getGearboxExtension().getPosition(), getMaxExtensionSpeed(), getMaxExtensionAcceleration()));
+            }
+
+            updateSetpointUnprotected().accept(setpoint);
+        }
     }
 
     public ExtensionControl getExtensionControl() {
@@ -117,5 +237,37 @@ public abstract class Extension implements Subsystem {
 
     public void setExtensionControl(ExtensionControl extensionControl) {
         this.extensionControl = extensionControl;
+    }
+
+    public ControlConstants getControlConstants() {
+        return controlConstants;
+    }
+
+    public void setControlConstants(ControlConstants controlConstants) {
+        this.controlConstants = controlConstants;
+    }
+
+    public double getLastError() {
+        return lastError;
+    }
+
+    public void setLastError(double lastError) {
+        this.lastError = lastError;
+    }
+
+    public double getRunningSum() {
+        return runningSum;
+    }
+
+    public void setRunningSum(double runningSum) {
+        this.runningSum = runningSum;
+    }
+
+    public IMotionProfile getMotionProfile() {
+        return motionProfile;
+    }
+
+    public void setMotionProfile(IMotionProfile motionProfile) {
+        this.motionProfile = motionProfile;
     }
 }

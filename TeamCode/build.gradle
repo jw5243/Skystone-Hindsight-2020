@@ -14,8 +14,17 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 
+android {
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
+}
+
 dependencies {
     implementation 'org.openftc:ftc-opmode-tuner-common:0.2'
     implementation 'org.openftc:rev-extensions-2:1.2'
     implementation 'org.jblas:jblas:1.2.4'
+    implementation 'org.ejml:ejml-all:0.38'
 }

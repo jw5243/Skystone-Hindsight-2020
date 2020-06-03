@@ -54,7 +54,7 @@ public class PermissionValidatorWrapper extends PermissionValidatorActivity {
         add(Manifest.permission.ACCESS_COARSE_LOCATION);
     }};
 
-    private final static Class startApplication = FtcRobotControllerActivity.class;
+    private final static Class startApplication = HindsightControllerActivity.class;
 
     public String mapPermissionToExplanation(final String permission) {
         if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -79,7 +79,7 @@ public class PermissionValidatorWrapper extends PermissionValidatorActivity {
 
     protected Class onStartApplication()
     {
-        FtcRobotControllerActivity.setPermissionsValidated();
+        HindsightControllerActivity.setPermissionsValidated();
         return startApplication;
     }
 }

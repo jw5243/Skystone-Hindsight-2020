@@ -20,6 +20,8 @@ android {
 
 dependencies {
     implementation 'org.jblas:jblas:1.2.4'
+    implementation 'org.ejml:ejml-all:0.38'
+    compile project(path: ':opencv-java')
 }
 
 repositories {

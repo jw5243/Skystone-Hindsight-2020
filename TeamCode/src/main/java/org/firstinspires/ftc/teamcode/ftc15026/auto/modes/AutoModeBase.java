@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.ftc15026.auto.actions.NoopAction;
  * routines that do actions).
  */
 public abstract class AutoModeBase {
-    protected final double mUpdateRate = 1.0 / 50.0;
+    protected final double mUpdateRate = 1d / 50d;
     protected boolean mActive = false;
     protected boolean mIsInterrupted = false;
 
@@ -92,7 +92,6 @@ public abstract class AutoModeBase {
         }
 
         action.done();
-
     }
 
     public boolean getIsInterrupted() {

@@ -6,22 +6,14 @@ import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
 public class ExpansionHubs implements Subsystem {
-    private static ExpansionHubs instance;
-
-    public static ExpansionHubs getInstance(ExpansionHubEx masterHub, ExpansionHubEx slaveHub) {
-        if(instance == null) {
-            instance = new ExpansionHubs(masterHub, slaveHub);
-        }
-
-        return instance;
-    }
-
+    private Robot robot;
     private ExpansionHubEx masterHub;
     private ExpansionHubEx slaveHub;
     private RevBulkData masterData;
     private RevBulkData slaveData;
 
-    public ExpansionHubs(ExpansionHubEx masterHub, ExpansionHubEx slaveHub) {
+    public ExpansionHubs(Robot robot, ExpansionHubEx masterHub, ExpansionHubEx slaveHub) {
+        setRobot(robot);
         setMasterHub(masterHub);
         setSlaveHub(slaveHub);
     }
@@ -33,7 +25,7 @@ public class ExpansionHubs implements Subsystem {
 
     @Override
     public void update(double dt) {
-        getRevBultData();
+        getRevBultData(dt);
     }
 
     @Override
@@ -62,12 +54,44 @@ public class ExpansionHubs implements Subsystem {
             //
         }
 
-        for(final RevMotor revMotor : Robot.getMotors()) {
+        for(final RevMotor revMotor : getRobot().getMotors()) {
             if(revMotor != null) {
                 if(revMotor.isOnMasterHub()) {
                     revMotor.setEncoderReading(getMasterData().getMotorCurrentPosition(revMotor.getMotor()));
                 } else {
                     revMotor.setEncoderReading(getSlaveData().getMotorCurrentPosition(revMotor.getMotor()));
+                }
+            }
+        }
+    }
+
+    public void getRevBultData(double dt) {
+        final RevBulkData masterData;
+        try {
+            masterData = getMasterHub().getBulkInputData();
+            if(masterData != null) {
+                setMasterData(masterData);
+            }
+        } catch(Exception e) {
+            //
+        }
+
+        final RevBulkData slaveData;
+        try {
+            slaveData = getSlaveHub().getBulkInputData();
+            if(slaveData != null) {
+                setSlaveData(slaveData);
+            }
+        } catch(Exception e) {
+            //
+        }
+
+        for(final RevMotor revMotor : getRobot().getMotors()) {
+            if(revMotor != null) {
+                if(revMotor.isOnMasterHub()) {
+                    revMotor.setEncoderReading(getMasterData().getMotorCurrentPosition(revMotor.getMotor()), dt);
+                } else {
+                    revMotor.setEncoderReading(getSlaveData().getMotorCurrentPosition(revMotor.getMotor()), dt);
                 }
             }
         }
@@ -103,5 +127,13 @@ public class ExpansionHubs implements Subsystem {
 
     public void setSlaveData(RevBulkData slaveData) {
         this.slaveData = slaveData;
+    }
+
+    public Robot getRobot() {
+        return robot;
+    }
+
+    public void setRobot(Robot robot) {
+        this.robot = robot;
     }
 }

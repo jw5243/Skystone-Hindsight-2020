@@ -88,7 +88,7 @@ public class EnhancedGamepad {
             setLeftStickButtonJustReleased(!getGamepad().left_stick_button && isLeftStickButtonLast());
             setRightStickButtonJustReleased(!getGamepad().right_stick_button && isRightStickButtonLast());
 
-            setDpadUpLast(getGamepad().dpad_down);
+            setDpadUpLast(getGamepad().dpad_up);
             setDpadDownLast(getGamepad().dpad_down);
             setDpadLeftLast(getGamepad().dpad_left);
             setDpadRightLast(getGamepad().dpad_right);
